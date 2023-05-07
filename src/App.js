@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import React, {useMemo, useRef, useState} from "react";
 import Counter from "./components/counter/Counter";
 import "./styles/App.css"
 // import PostItem from "./components/posts/PostItem";
@@ -7,13 +7,17 @@ import MyButton from "./components/UI/Button/MyButton";
 import MyInput from "./components/UI/Input/MyInput";
 import PostForm from "./components/posts/PostForm";
 import MySelect from "./components/UI/Select/MySelect";
+import PostFilter from "./components/posts/PostFilter";
+import MyModal from "./components/UI/ModalWindows/MyModal";
+import {CSSTransition, TransitionGroup} from "react-transition-group";
+import {usePosts} from "./components/hooks/usePosts";
 
 function App() {
     const [posts, setPosts] = useState(
         [
-            {id:1, title: 'JavaScript', description: ' А JavaScript - это язык программирования'},
-            {id:2, title: 'Python', description: 'Python - это язык программирования'},
-            {id:3, title: 'C#', description: 'Язык C# - это язык программирования'}
+            {id:1, title: 'JavaScript', description: 'JavaScript - это язык программирования'},
+            {id:2, title: 'Python', description: 'Б Python - это язык программирования'},
+            {id:3, title: 'AC#', description: 'Язык C# - это язык программирования'}
         ])
     // const [posts1, setPosts1] = useState(
     //     [
@@ -32,18 +36,25 @@ function App() {
         setPosts([...posts, {...post, id:Date.now()}])
         setPost({title: '', description: ''})
     }
-    const [selectedSort, setSelectedSort] = useState('')
+    // const [selectedSort, setSelectedSort] = useState('')
+    // const [searchQuery, setSearchQuery] = useState('')
+
+    const [filter, setFilter] = useState({sortQuery: '', searchQuery: ''})
+
+    const sortedAndSearchedPosts = usePosts(posts,filter.sortQuery, filter.searchQuery)
+
     const createPost = (newPost) =>{
         setPosts([...posts, newPost])
+        setModalVisible(false)
     }
     const removePost = (postForRemove) => {
         setPosts((posts.filter(post => post.id !== postForRemove.id)))
     }
-    const sortPosts = (sort) =>{
-        setSelectedSort(sort);
-        setPosts([...posts].sort((a,b)=> a[sort].localeCompare(b[sort])))
-    }
 
+    // const sortPosts = (sort) =>{
+    //     setSelectedSort(sort);
+    // }
+    const [modalVisible, setModalVisible] = useState(false);
   return (
     <div className="App">
         <div className="visually-hidden example1">
@@ -77,31 +88,17 @@ function App() {
             {/*<PostsList posts={posts1} title="Просты про Python"/>*/}
         </div>
         <div className='example 3'>
-            <PostForm create={createPost}/>
-            <hr style={{margin:'15px 0px'}}/>
-            <div>
-                <MySelect
-                    value={selectedSort}
-                    onChange={sortPosts}
-                    defaultValue = "Сортировка"
-                    options ={[
-                        {value:'title', name:'По названию'},
-                        {value: 'description', name: 'По описанию'}
-                    ]}
-                />
-            </div>
-            {
-                posts.length !== 0 //Условная отрисовка
-                    ? <PostsList remove={removePost} posts={posts} title="Посты про JS"/>
-                    :
-                    <div>
-                        <h1
-                            style={{textAlign:'center'}}>Список постов пуст!
-                        </h1>
-                    </div>
-            }
-        </div>
+            <MyButton style={{marginTop: '30px'}} onClick={() => setModalVisible(true)}>
+                Создать пост
+            </MyButton>
+            <MyModal visible={modalVisible} setVisible={setModalVisible}>
+                <PostForm create={createPost}/>
+            </MyModal>
 
+            <hr style={{margin:'15px 0px'}}/>
+            <PostFilter filter={filter} setFilter={setFilter}/>
+            <PostsList posts={sortedAndSearchedPosts} remove={removePost} title='Посты про ЯП'/>
+        </div>
     </div>
   );
 }
