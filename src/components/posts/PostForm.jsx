@@ -4,14 +4,14 @@ import MyButton from "../UI/Button/MyButton";
 import PostsList from "./PostsList";
 
 const PostForm = (props) => {
-    const [post, setPost] = useState({title: '', description: ''})
+    const [post, setPost] = useState({title: '', body: ''})
     const addNewPost = (e) => {
         e.preventDefault(); //чтобы страница не обновлялась
         const newPost = {
             ...post, id:Date.now()
         }
         props.create(newPost)
-        setPost({title: '', description: ''})
+        setPost({title: '', body: ''})
     }
     return (
         <form>
@@ -25,8 +25,8 @@ const PostForm = (props) => {
             <MyInput
                 type="text"
                 placeholder="Описание"
-                value={post.description}
-                onChange={e => setPost({...post, description: e.target.value})}
+                value={post.body}
+                onChange={e => setPost({...post, body: e.target.value})}
             />
             <MyButton onClick={addNewPost}>Создать пост</MyButton>
         </form>

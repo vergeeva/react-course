@@ -18,8 +18,6 @@ const PostsList = (props) => {
             </h1>
             <TransitionGroup>
                 {props.posts.map((post, index) => (
-
-
                     <CSSTransition
                         key={post.id}
                         timeout={500}
